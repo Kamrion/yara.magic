@@ -6,6 +6,6 @@ rules may contain metainfo about corresponding filetype
 - (optional) category. Based on my thinking. Need to be extender and detilizing
 
 plans
-- fix or branch too slow rules 
+- fix or split too slow rules 
 - add extention(s) to corresponding filtypes
 - add mechanism for test rules
