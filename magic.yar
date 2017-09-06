@@ -257,12 +257,16 @@ rule magic_jpeg
 		category = "multimedia"
 
     strings:
-        $var1 = { FF D8 FF DB FB }
-        $var2 = { FF D8 FF E0 ?? ?? 4A 46 }
-        $var3 = { FF D8 FF E1 ?? ?? 45 78 69 66 00 00 }
+		$SoiFF = { FF D8 FF }	// Start Of Image
+        $SoiDqt = { FF D8 FF DB }	// StarOfImage + DefineQuantizationTable
+        $jfif = { FF D8 FF E0 ?? ?? 4A 46 49 46 00}	// + 01
+        $exif = { FF D8 FF E1 ?? ?? 45 78 69 66 00 00 }
 				
     condition:
-        for any of them : ($ at 0)
+        $SoiFF at 0
+		or $SoiDqt at 0
+		or $jfif at 0
+		or $exif at 0
 }
 
 rule magic_iff
@@ -473,7 +477,8 @@ rule magic_zip
 		category = "archive"
 		
     strings:
-        $magic = { 50 4B 03 04 }
+//        $pk = "PK"	// Phil Katz
+		$magic = { 50 4B 03 04 }
         $empty = { 50 4B 05 06 }	// empty archive
         $spanned = { 50 4B 07 08 }	// spanned archive
 				
@@ -585,7 +590,7 @@ rule magic_ps
         description = "PostScript document"
 		
     strings:
-        $magic = { 25 21 50 53 }
+        $magic = { 25 21 50 53 }	// %!PS
 				
     condition:
 		$magic at 0
@@ -597,7 +602,7 @@ rule magic_pdf
         description = "PDF document"
 		
     strings:
-        $magic = { 25 50 44 46 }
+        $magic = "%PDF"
 				
     condition:
 		$magic at 0
@@ -1178,5 +1183,33 @@ rule magic_ulmage //???
 				
     condition:
 		$magic at 0
+}
+
+rule magic_nixScript
+{
+    meta:
+        description = "Unix or Linux scripts"
+		
+    strings:
+        $magic = "#!"
+				
+    condition:
+		$magic at 0
+}
+
+rule magic_wad	//???
+{
+    meta:
+        description = "WAD files. Default format of package files for the video game Doom and its sequel and games based on it"
+		
+		
+    strings:
+        $internal_WAD = "IWAD"
+        $patch_WAD = "PWAD"
+        $quake = "WAD2"
+        $half_life = "WAD3"
+								
+    condition:
+		for 1 of them : ($ at 0)
 }
 
